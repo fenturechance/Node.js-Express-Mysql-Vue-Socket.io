@@ -17,7 +17,7 @@ npm run build
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-# set mysql\bin\my.ini
+# Set mysql\bin\my.ini
 log-bin=mysql-bin
 
 # SQL set
