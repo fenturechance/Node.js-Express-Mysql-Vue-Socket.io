@@ -51,8 +51,7 @@ let binlog = () => {
     let connection = mysql.createConnection(dsn2);
     let zongji = new ZongJi(dsn);
     zongji.on('binlog', (evt) => {
-        // evt.dump();
-        // console.log(evt);
+        if(evt.query == "BEGIN" || evt.query == "") return;
         connection.query('SELECT * FROM user',(err,rs,fields)=>{
             if(err) throw err;
             io.sockets.emit('message',rs);
