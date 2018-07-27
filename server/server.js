@@ -5,6 +5,7 @@ let fs = require('fs');
 let qs = require('qs');
 let MYSQLEvents = require('mysql-events');
 let mysql = require('mysql');
+let ZongJi = require('zongji');
 
 let app = express();
 app.all('*', function(req, res, next) {
@@ -20,13 +21,7 @@ let server = http.createServer(app);
 let io = socket.listen(server);
 console.log('Server Started');
 
-
-let dsn = {
-    host : 'localhost',
-    user : 'root',
-    password : '',
-}
-let testMySQML = () => {
+let testMySQL = () => {
     let dsn2 = {
         host : 'localhost',
         user : 'root',
@@ -41,23 +36,58 @@ let testMySQML = () => {
     });
 }
 
-let mysqlEventWatcher = MYSQLEvents(dsn);
-
-let watcher = mysqlEventWatcher.add('testsocketio.user', ( oldRow , newRow , e ) => {
-    console.log(oldRow,newRow);
-    if( oldRow === null ){
-        console.log(newRow);
-        io.sockets.emit('message',newRow);
+let binlog = () => {
+    let dsn = {
+        host : 'localhost',
+        port : '3306',
+        user : 'root',
+        password : '',
+        debug: true
     }
-
-    if( newRow === null ){
-
+    let dsn2 = {
+        ...dsn,
+        database : 'testsocketio'
     }
+    let connection = mysql.createConnection(dsn2);
+    let zongji = new ZongJi(dsn);
+    zongji.on('binlog', (evt) => {
+        // evt.dump();
+        // console.log(evt);
+        connection.query('SELECT * FROM user',(err,rs,fields)=>{
+            if(err) throw err;
+            io.sockets.emit('message',rs);
+        });
+    });
+    zongji.start({ includeEvents: ['query'] });
+}
 
-    if( newRow !== null && newRow !== null){
-
+let testMysqlEvents = () => {
+    let dsn = {
+        host : 'localhost',
+        user : 'root',
+        password : '',
     }
-});
+    let mysqlEventWatcher = MYSQLEvents(dsn);
+    
+    let watcher = mysqlEventWatcher.add('testsocketio.user', ( oldRow , newRow , e ) => {
+        console.log(oldRow,newRow);
+        if( oldRow === null ){
+            console.log(newRow);
+            io.sockets.emit('message',newRow);
+        }
+    
+        if( newRow === null ){
+    
+        }
+    
+        if( newRow !== null && newRow !== null){
+    
+        }
+    });
+}
+
+
+binlog();
 
 
 io.sockets.on('connection', client => {

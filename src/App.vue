@@ -15,7 +15,7 @@ export default {
     },
     created() {
         this.socket.on('message', data => {
-            response = data;
+            this.response = data;
         } )
     }
 }
