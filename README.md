@@ -22,3 +22,6 @@ log-bin=mysql-bin
 
 # SQL set
 SET GLOBAL binlog_format = 'ROW';
+
+# Run node.js server
+node server/server
