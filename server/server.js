@@ -3,7 +3,7 @@ let express = require('express');
 let http = require('http');
 let fs = require('fs');
 let qs = require('qs');
-let MYSQLEvents = require('mysql-events');
+// let MYSQLEvents = require('mysql-events');
 let mysql = require('mysql');
 let ZongJi = require('zongji');
 
@@ -61,30 +61,7 @@ let binlog = () => {
     zongji.start({ includeEvents: ['query'] });
 }
 
-let testMysqlEvents = () => {
-    let dsn = {
-        host : 'localhost',
-        user : 'root',
-        password : '',
-    }
-    let mysqlEventWatcher = MYSQLEvents(dsn);
-    
-    let watcher = mysqlEventWatcher.add('testsocketio.user', ( oldRow , newRow , e ) => {
-        console.log(oldRow,newRow);
-        if( oldRow === null ){
-            console.log(newRow);
-            io.sockets.emit('message',newRow);
-        }
-    
-        if( newRow === null ){
-    
-        }
-    
-        if( newRow !== null && newRow !== null){
-    
-        }
-    });
-}
+// let testMysqlEvents = () => { let dsn = { host : 'localhost', user : 'root', password : '', } let mysqlEventWatcher = MYSQLEvents(dsn); let watcher = mysqlEventWatcher.add('testsocketio.user', ( oldRow , newRow , e ) => { console.log(oldRow,newRow); if( oldRow === null ){ console.log(newRow); io.sockets.emit('message',newRow); } if( newRow === null ){ } if( newRow !== null && newRow !== null){ } }); }
 
 
 binlog();
@@ -92,9 +69,6 @@ binlog();
 
 io.sockets.on('connection', client => {
     console.log('new client');
-    client.on('message', data => {
-
-    })
 })
 
 server.listen(8080,()=>{
